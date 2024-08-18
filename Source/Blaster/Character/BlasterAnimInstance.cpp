@@ -37,7 +37,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	bIsCrouched = BlasterCharacter->bIsCrouched;
 	bAiming = BlasterCharacter->IsAiming();
-
+	TurningInPlace = BlasterCharacter->GetTurningInPlace();
 
 
 	FRotator AimRotator = BlasterCharacter->GetBaseAimRotation();
@@ -77,6 +77,5 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		LeftHandTransform.SetLocation(OutPosition);
 		LeftHandTransform.SetRotation(FQuat(OutRotation));
 	}
-
 
 }
