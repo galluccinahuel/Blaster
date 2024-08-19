@@ -36,9 +36,14 @@ ABlasterCharacter::ABlasterCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 600.f);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+
+	NetUpdateFrequency = 66.f;
+	MinNetUpdateFrequency = 33.f;
+
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -150,7 +155,7 @@ void ABlasterCharacter::AimButtonPressed(const FInputActionValue& Value)
 {
 	bool Aimed = Value.Get<bool>();
 	//UE_LOG(LogTemp, Warning, TEXT("Aimed: %s"), Aimed ? TEXT("true") : TEXT("false"));
-	if (Combat && Aimed)
+	if (Combat && Aimed && Combat->EquippedWeapon != nullptr)
 	{
 		Combat->SetAiming(true);
 	}
@@ -268,7 +273,15 @@ AWeapon* ABlasterCharacter::GetEquippedWeapon()
 
 void ABlasterCharacter::Jump()
 {
-	Super::Jump();
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Super::Jump();
+
+	}
 }
 
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

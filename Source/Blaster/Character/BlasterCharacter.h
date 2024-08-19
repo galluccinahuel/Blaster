@@ -25,7 +25,6 @@ public:
 	ABlasterCharacter();
 
 	virtual void Tick(float DeltaTime) override;
-	virtual void Jump() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
@@ -61,6 +60,8 @@ protected:
 	void CrouchButtonPresed();
 	void AimButtonPressed(const FInputActionValue& Value);
 	void AimOffSet(float DeltaTime);
+	virtual void Jump() override;
+
 
 private:
 
