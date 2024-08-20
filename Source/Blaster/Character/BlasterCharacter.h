@@ -14,6 +14,7 @@ class UInputAction;
 class UWidgetComponent;
 class AWeapon;
 class UCombatComponent;
+class UAnimMontage;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter
@@ -28,6 +29,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
+	void PlayFireMontage(bool bAiming);
 
 protected:
 
@@ -54,10 +56,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* AimPressedAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* FirePressedAction;
+
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void EquipButtonPressed();
-	void CrouchButtonPresed();
+	void CrouchButtonPressed();
+	void FireButtonPressed(const FInputActionValue& Value);
 	void AimButtonPressed(const FInputActionValue& Value);
 	void AimOffSet(float DeltaTime);
 	virtual void Jump() override;
@@ -94,6 +100,9 @@ private:
 	ETurningInPlace TurningInPlace;
 
 	void TurnInPlace(float DeltaTime);
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	UAnimMontage* FireWeaponMontage;
 
 public:
 

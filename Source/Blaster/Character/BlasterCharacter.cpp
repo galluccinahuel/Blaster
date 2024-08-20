@@ -12,6 +12,7 @@
 #include "Blaster/BlasterComponents/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "BlasterAnimInstance.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -61,6 +62,22 @@ void ABlasterCharacter::PostInitializeComponents()
 	{
 		Combat->Character = this;
 	}
+}
+
+void ABlasterCharacter::PlayFireMontage(bool bAiming)
+{
+	if (Combat == nullptr || Combat->EquippedWeapon == nullptr ) return;
+	
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance && FireWeaponMontage)
+	{
+		AnimInstance->Montage_Play(FireWeaponMontage);
+		FName SectionName;
+		SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
+
 }
 
 void ABlasterCharacter::BeginPlay()
@@ -138,7 +155,7 @@ void ABlasterCharacter::EquipButtonPressed()
 	}
 }
 
-void ABlasterCharacter::CrouchButtonPresed()
+void ABlasterCharacter::CrouchButtonPressed()
 {
 	if (bIsCrouched)
 	{
@@ -149,6 +166,17 @@ void ABlasterCharacter::CrouchButtonPresed()
 		Crouch();
 
 	}
+}
+
+void ABlasterCharacter::FireButtonPressed(const FInputActionValue& Value)
+{
+	bool bFire = Value.Get<bool>();
+
+	if (Combat)
+	{
+		Combat->FireButtonPressed(bFire);
+	}
+	
 }
 
 void ABlasterCharacter::AimButtonPressed(const FInputActionValue& Value)
@@ -294,8 +322,10 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ThisClass::Jump);
 		EnhancedInputComponent->BindAction(EquipAction, ETriggerEvent::Triggered, this, &ThisClass::EquipButtonPressed);
-		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ThisClass::CrouchButtonPresed);
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ThisClass::CrouchButtonPressed);
 		EnhancedInputComponent->BindAction(AimPressedAction, ETriggerEvent::Triggered, this, &ThisClass::AimButtonPressed);
+		EnhancedInputComponent->BindAction(FirePressedAction, ETriggerEvent::Triggered, this, &ThisClass::FireButtonPressed);
+
 	}
 }
 

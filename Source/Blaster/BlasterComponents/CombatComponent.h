@@ -7,6 +7,7 @@
 class AWeapon;
 class ABlasterCharacter;
 
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BLASTER_API UCombatComponent : public UActorComponent
 {
@@ -33,6 +34,9 @@ protected:
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 
+	void FireButtonPressed(bool bPressed);
+
+
 private:
 
 	ABlasterCharacter* Character;
@@ -45,5 +49,8 @@ private:
 
 	float BaseWalkSpeed;
 	float AimWalkSpeed;
+	bool bFireButtonPressed;
+
+
 
 };
