@@ -16,12 +16,22 @@ UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem():
 	{
 		SessionInterface = Subsystem->GetSessionInterface();
 	}
+	if (SessionInterface.IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Session Interface is valid!"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Session Interface is NOT valid!"));
+	}
+
 }
 
 void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FString MatchType)
 {
 	if (!SessionInterface.IsValid())
 	{
+		UE_LOG(LogTemp, Error, TEXT("CreateSession: Session Interface is NOT valid!"));
 		return;
 	}
 
@@ -29,12 +39,13 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 
 	if (ExistingSession != nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("CreateSession: Existing session found, destroying..."));
 		bCreateSessionOnDestroy = true;
 		LastNumPublicConnections = NumPublicConnections;
 		LastMatchType = MatchType;
 		DestroySession();
 	}
-
+	UE_LOG(LogTemp, Warning, TEXT("CreateSession: Creating session with %d public connections and MatchType %s"), NumPublicConnections, *MatchType);
 	//STORE THE DELEGATE SO WE CAN LATER REMOVE FROM THE DELEGATE LIST
 	CreateSessionCompleteDelegateHandle = SessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
 
@@ -64,9 +75,10 @@ void UMultiplayerSessionsSubsystem::FindSessions(int32 MaxSearchResults)
 {
 	if (!SessionInterface.IsValid())
 	{
+		UE_LOG(LogTemp, Error, TEXT("FindSessions: Session Interface is NOT valid!"));
 		return;
 	}
-
+	UE_LOG(LogTemp, Warning, TEXT("FindSessions: Starting session search with MaxSearchResults %d"), MaxSearchResults);
 	FindSessionsCompleteDelegateHandle = SessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegate);
 
 	LastSessionSearch = MakeShareable(new FOnlineSessionSearch());
@@ -100,13 +112,14 @@ void UMultiplayerSessionsSubsystem::JoinSession(const FOnlineSessionSearchResult
 		MultiplayerOnJoinSessionComplete.Broadcast(EOnJoinSessionCompleteResult::UnknownError);
 		return;
 	}
-
+	UE_LOG(LogTemp, Warning, TEXT("JoinSession: Attempting to join session..."));
 	JoinSessionCompleteDelegateHandle = SessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
 
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 
 	if (!SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionResult))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to join session"));
 		SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegateHandle);
 		MultiplayerOnJoinSessionComplete.Broadcast(EOnJoinSessionCompleteResult::UnknownError);
 	}
