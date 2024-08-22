@@ -41,7 +41,9 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 
 	if (bFireButtonPressed)
 	{
-		ServerFire();
+		FHitResult HitResult;
+		TraceUnderCrosshairs(HitResult);
+		ServerFire(HitResult.ImpactPoint);
 	}
 }
 
@@ -74,40 +76,23 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResul)
 			End,
 			ECollisionChannel::ECC_Visibility
 		);
-
-		if (!TraceHitResul.bBlockingHit)
-		{
-			TraceHitResul.ImpactPoint = End;
-			HitTarget = End;
-		}
-		else
-		{
-			HitTarget = TraceHitResul.ImpactPoint;
-			DrawDebugSphere(
-				GetWorld(),
-				TraceHitResul.ImpactPoint,
-				32.f,
-				32,
-				FColor::Red
-			);
-		}
 	}
 }
 
-void UCombatComponent::MulticastFire_Implementation()
+void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	if (EquippedWeapon == nullptr) return;
 
 	if (Character)
 	{
 		Character->PlayFireMontage(bAiming);
-		EquippedWeapon->Fire(HitTarget);
+		EquippedWeapon->Fire(TraceHitTarget);
 	}
 }
 
-void UCombatComponent::ServerFire_Implementation()
+void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
-	MulticastFire();
+	MulticastFire(TraceHitTarget);
 }
 
 void UCombatComponent::SetAiming(bool bIsAiming)
@@ -134,10 +119,6 @@ void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	FHitResult HitResult;
-	TraceUnderCrosshairs(HitResult);
-
 }
 
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
