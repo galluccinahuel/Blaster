@@ -299,6 +299,13 @@ AWeapon* ABlasterCharacter::GetEquippedWeapon()
 	
 }
 
+FVector ABlasterCharacter::GetHitTarget() const
+{
+	if (Combat == nullptr) return FVector();
+
+	return Combat->HitTarget;
+}
+
 void ABlasterCharacter::Jump()
 {
 	if (bIsCrouched)
