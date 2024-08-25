@@ -45,6 +45,18 @@ public:
 	UPROPERTY(EditAnywhere, Category = "CrossHairs")
 	UTexture2D* CrosshairsBottom;
 
+	UPROPERTY(EditAnywhere)
+	float ZoomedFOV = 30.f;
+
+	UPROPERTY(EditAnywhere)
+	float ZoomInterpSpeed = 20.f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float FireDelay = .15f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	bool bAutomatic = true;
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -90,11 +102,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ACasing> CasingClass;
 
-	UPROPERTY(EditAnywhere)
-	float ZoomedFOV = 30.f;
-
-	UPROPERTY(EditAnywhere)
-	float ZoomInterpSpeed = 20.f;
 
 public:
 

@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "Blaster/BlasterTypes/TurningInPlace.h"
+#include "Blaster/Interfaces/InteractWithCrosshairsInterface.h"
 #include "BlasterCharacter.generated.h"
 
 class USpringArmComponent;
@@ -17,7 +18,7 @@ class UCombatComponent;
 class UAnimMontage;
 
 UCLASS()
-class BLASTER_API ABlasterCharacter : public ACharacter
+class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
 	GENERATED_BODY()
 
@@ -30,6 +31,13 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(bool bAiming);
+
+	
+	//tengo una funcion en projectile q se llama cuando se logra un hit contra un characterblaster,
+	//el character reproduce un montaje pero solo se ve del lado del servidor
+	//esta funcion se va a llamar para q se reproduzca en todos los clientes
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastHit();
 
 protected:
 
@@ -67,6 +75,7 @@ protected:
 	void AimButtonPressed(const FInputActionValue& Value);
 	void AimOffSet(float DeltaTime);
 	virtual void Jump() override;
+	void PlayHitReactMontage();
 
 
 private:
@@ -103,6 +112,13 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	UAnimMontage* FireWeaponMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	UAnimMontage* HitReactMontage;
+
+	void HideCameraIfCharacterClose();
+
+	float CameraThreshold = 200.f;
 
 public:
 
