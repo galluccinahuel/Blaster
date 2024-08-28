@@ -31,17 +31,24 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(bool bAiming);
+	void PlayElimMontage();
+	void Elim();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastElim();
 
 	
 	//tengo una funcion en projectile q se llama cuando se logra un hit contra un characterblaster,
 	//el character reproduce un montaje pero solo se ve del lado del servidor
 	//esta funcion se va a llamar para q se reproduzca en todos los clientes
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastHit();
+	//UFUNCTION(NetMulticast, Unreliable)
+	//void MulticastHit();
 
 protected:
 
 	virtual void BeginPlay() override;
+
+	void UpdateHUDHealth();
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* BlasterContext;
@@ -77,6 +84,8 @@ protected:
 	virtual void Jump() override;
 	void PlayHitReactMontage();
 
+	UFUNCTION()
+	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* InstigatorController, AActor* DamageCauser);
 
 private:
 
@@ -116,9 +125,32 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	UAnimMontage* HitReactMontage;
 
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	UAnimMontage* ElimMontage;
+
 	void HideCameraIfCharacterClose();
 
 	float CameraThreshold = 200.f;
+
+	UPROPERTY(EditAnywhere, Category = "Character Stats")
+	float MaxHealth = 100.f;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Health, VisibleAnywhere, Category = "Character Stats")
+	float Health = 100.f;
+
+	UFUNCTION()
+	void OnRep_Health();
+
+	class ABlasterPlayerController* BlasterPlayerController;
+
+	bool bElimmed = false;
+
+	FTimerHandle ElimTimer;
+
+	UPROPERTY(EditDefaultsOnly)
+	float ElimDelay = 3.f;
+
+	void ElimTimerFinished();
 
 public:
 
@@ -132,6 +164,7 @@ public:
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 	FVector GetHitTarget() const;
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 
 
 };

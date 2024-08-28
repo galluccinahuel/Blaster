@@ -16,6 +16,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
+
 	if (BlasterCharacter == nullptr)
 	{
 		BlasterCharacter = Cast<ABlasterCharacter>(TryGetPawnOwner());
@@ -87,5 +88,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		*/
 
 	}
+
+	bElimmed = BlasterCharacter->IsElimmed();
 
 }
