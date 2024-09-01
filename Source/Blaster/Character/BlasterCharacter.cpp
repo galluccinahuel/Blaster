@@ -51,6 +51,7 @@ ABlasterCharacter::ABlasterCharacter()
 	NetUpdateFrequency = 66.f;
 	MinNetUpdateFrequency = 33.f;
 
+	DissolveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DissolveTimelineComponent"));
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -143,6 +144,20 @@ void ABlasterCharacter::MulticastElim_Implementation()
 {
 	bElimmed = true;
 	PlayElimMontage();
+
+	if (DissolveMaterialInstance0)
+	{
+		DynamicDissolveMaterialInstance0 = UMaterialInstanceDynamic::Create(DissolveMaterialInstance0, this);
+		DynamicDissolveMaterialInstance1 = UMaterialInstanceDynamic::Create(DissolveMaterialInstance1, this);
+		GetMesh()->SetMaterial(0, DynamicDissolveMaterialInstance0);
+		GetMesh()->SetMaterial(1, DynamicDissolveMaterialInstance1);
+		DynamicDissolveMaterialInstance0->SetScalarParameterValue(TEXT("Disolve"), -0.55f);
+		DynamicDissolveMaterialInstance0->SetScalarParameterValue(TEXT("Glow"), 220.f);
+		DynamicDissolveMaterialInstance1->SetScalarParameterValue(TEXT("Disolve"), -0.55f);
+		DynamicDissolveMaterialInstance1->SetScalarParameterValue(TEXT("Glow"), 220.f);
+	}
+	StartDissolve();
+
 }
 
 void ABlasterCharacter::ElimTimerFinished()
@@ -377,6 +392,27 @@ void ABlasterCharacter::OnRep_Health()
 }
 
 
+
+void ABlasterCharacter::UpdateDissolveMaterial(float DissolveValue)
+{
+	if (DynamicDissolveMaterialInstance0)
+	{
+		DynamicDissolveMaterialInstance0->SetScalarParameterValue(TEXT("Disolve"), DissolveValue);
+		DynamicDissolveMaterialInstance1->SetScalarParameterValue(TEXT("Disolve"), DissolveValue);
+
+	}
+}
+
+void ABlasterCharacter::StartDissolve()
+{
+	DissolveTrack.BindDynamic(this, &ThisClass::UpdateDissolveMaterial);
+	
+	if (DissolveCurve && DissolveTimeline)
+	{
+		DissolveTimeline->AddInterpFloat(DissolveCurve, DissolveTrack);
+		DissolveTimeline->Play();
+	}
+}
 
 void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {
