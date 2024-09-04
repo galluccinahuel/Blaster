@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,9 +5,8 @@
 #include "GameFramework/PlayerController.h"
 #include "BlasterPlayerController.generated.h"
 
-/**
- * 
- */
+class ABlasterHUD;
+
 UCLASS()
 class BLASTER_API ABlasterPlayerController : public APlayerController
 {
@@ -17,6 +15,8 @@ class BLASTER_API ABlasterPlayerController : public APlayerController
 public:
 
 	void SetHUDHealth(float Health, float MaxHealth);
+	void SetHUDScore(float Score);
+	virtual void OnPossess(APawn* InPawn) override;
 
 protected:
 
@@ -24,6 +24,6 @@ protected:
 
 private:
 
-	class ABlasterHUD* BlasterHUD;
+	ABlasterHUD* BlasterHUD;
 
 };

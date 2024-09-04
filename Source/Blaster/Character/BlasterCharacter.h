@@ -17,6 +17,8 @@ class UWidgetComponent;
 class AWeapon;
 class UCombatComponent;
 class UAnimMontage;
+class USoundCue;
+class ABlasterPlayerState;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
@@ -34,16 +36,20 @@ public:
 	void PlayFireMontage(bool bAiming);
 	void PlayElimMontage();
 	void Elim();
+	virtual void Destroyed() override;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastElim();
 
-	
+
 	//tengo una funcion en projectile q se llama cuando se logra un hit contra un characterblaster,
 	//el character reproduce un montaje pero solo se ve del lado del servidor
 	//esta funcion se va a llamar para q se reproduzca en todos los clientes
 	//UFUNCTION(NetMulticast, Unreliable)
 	//void MulticastHit();
+
+	ABlasterPlayerState* BlasterPlayerState;
+
 
 protected:
 
@@ -87,6 +93,9 @@ protected:
 
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* InstigatorController, AActor* DamageCauser);
+
+	void PollInit();
+
 
 private:
 
@@ -179,6 +188,16 @@ private:
 	UMaterialInstance* DissolveMaterialInstance1;
 
 
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ElimBotEffect;
+
+	UPROPERTY(VisibleAnywhere)
+	UParticleSystemComponent* ElimBotComponent;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* ElimBotSound;
+
+
 public:
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
@@ -192,6 +211,8 @@ public:
 	FVector GetHitTarget() const;
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE bool IsElimmed() const { return bElimmed; }
+	FORCEINLINE  float GetHealth() const { return Health; }
+	FORCEINLINE  float GetMaxHealth() const { return MaxHealth; }
 
 
 };
