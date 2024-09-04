@@ -48,8 +48,8 @@ public:
 	//UFUNCTION(NetMulticast, Unreliable)
 	//void MulticastHit();
 
+	UPROPERTY()
 	ABlasterPlayerState* BlasterPlayerState;
-
 
 protected:
 
@@ -151,6 +151,7 @@ private:
 	UFUNCTION()
 	void OnRep_Health();
 
+	UPROPERTY()
 	class ABlasterPlayerController* BlasterPlayerController;
 
 	bool bElimmed = false;
