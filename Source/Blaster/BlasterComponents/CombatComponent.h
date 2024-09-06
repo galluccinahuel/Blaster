@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Blaster/HUD/BlasterHUD.h"
+#include "Blaster/Weapon/WeaponTypes.h"
 #include "CombatComponent.generated.h"
 
 #define TRACE_LENGHT 80000.f
@@ -76,26 +77,33 @@ private:
 	float CrosshairAimFactor;
 	float CrosshairShootingFactor;
 	FHUDPackage HUDPackage;
-
 	FVector HitTarget;
-
-
 	float DefaultFOV;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float ZoomedFOV = 30.f;
-
 	float CurrentFOV;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float ZoomInterpSpeed = 20.f;
 
 	void InterFOV(float DeltaTime);
-
 	FTimerHandle FireTimer;
 	bool bCanFire = true;
 	void StartFireTimer();
 	void FireTimerFinished();
+	bool CanFire();
 
+	UPROPERTY(ReplicatedUsing = OnRep_CarriedAmmo)
+	int32 CarriedAmmo;
 
+	UFUNCTION()
+	void OnRep_CarriedAmmo();
+
+	TMap<EWeaponType, int32>CarriedAmmoMap;
+
+	UPROPERTY(EditAnywhere)
+	int32 StartingARAmmo = 30;
+
+	void InitializeCarriedAmmo();
 };
