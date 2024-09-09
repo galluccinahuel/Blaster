@@ -7,6 +7,7 @@
 #include "Blaster/BlasterTypes/TurningInPlace.h"
 #include "Blaster/Interfaces/InteractWithCrosshairsInterface.h"
 #include "Components/TimelineComponent.h"
+#include "Blaster/BlasterTypes/CombatState.h"
 #include "BlasterCharacter.generated.h"
 
 class USpringArmComponent;
@@ -35,12 +36,12 @@ public:
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(bool bAiming);
 	void PlayElimMontage();
+	void PlayReloadMontage();
 	void Elim();
 	virtual void Destroyed() override;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastElim();
-
 
 	//tengo una funcion en projectile q se llama cuando se logra un hit contra un characterblaster,
 	//el character reproduce un montaje pero solo se ve del lado del servidor
@@ -81,21 +82,25 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* FirePressedAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* ReloadPressedAction;
+
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void EquipButtonPressed();
 	void CrouchButtonPressed();
 	void FireButtonPressed(const FInputActionValue& Value);
 	void AimButtonPressed(const FInputActionValue& Value);
+	void ReloadButtonPressed(const FInputActionValue& Value);
 	void AimOffSet(float DeltaTime);
 	virtual void Jump() override;
 	void PlayHitReactMontage();
+
 
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* InstigatorController, AActor* DamageCauser);
 
 	void PollInit();
-
 
 private:
 
@@ -114,7 +119,7 @@ private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "True"))
 	UCombatComponent* Combat;
 
 	UFUNCTION(Server, Reliable)
@@ -137,6 +142,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	UAnimMontage* ElimMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	UAnimMontage* ReloadMontage;
 
 	void HideCameraIfCharacterClose();
 
@@ -188,7 +196,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Elim")
 	UMaterialInstance* DissolveMaterialInstance1;
 
-
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* ElimBotEffect;
 
@@ -197,6 +204,8 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	USoundCue* ElimBotSound;
+
+
 
 
 public:
@@ -214,6 +223,6 @@ public:
 	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 	FORCEINLINE  float GetHealth() const { return Health; }
 	FORCEINLINE  float GetMaxHealth() const { return MaxHealth; }
-
+	ECombatState GetCombatState() const;
 
 };
