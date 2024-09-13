@@ -29,7 +29,6 @@ class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCro
 public:
 
 	ABlasterCharacter();
-
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -39,6 +38,9 @@ public:
 	void PlayReloadMontage();
 	void Elim();
 	virtual void Destroyed() override;
+
+	UPROPERTY(Replicated)
+	bool bDisableGameplay = false;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastElim();
@@ -205,15 +207,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	USoundCue* ElimBotSound;
 
-
-
-
 public:
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	bool IsWeaponEquipped();
 	bool IsAiming();
-
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
 	AWeapon* GetEquippedWeapon();
@@ -224,5 +222,6 @@ public:
 	FORCEINLINE  float GetHealth() const { return Health; }
 	FORCEINLINE  float GetMaxHealth() const { return MaxHealth; }
 	ECombatState GetCombatState() const;
-
+	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
+	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 };

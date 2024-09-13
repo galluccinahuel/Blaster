@@ -60,13 +60,11 @@ bool UMenu::Initialize()
 	if (HostButton)
 	{
 		HostButton->OnClicked.AddDynamic(this, &ThisClass::HostButtonClicked);
-
 	}
 
 	if (JoinButton)
 	{
 		JoinButton->OnClicked.AddDynamic(this, &ThisClass::JoinButtonClicked);
-
 	}
 	return true;
 }
@@ -158,7 +156,6 @@ void UMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 	{
 		JoinButton->SetIsEnabled(true);
 	}
-
 }
 
 void UMenu::OnDestroySession(bool bWasSuccessful)
@@ -175,7 +172,6 @@ void UMenu::HostButtonClicked()
 	if (MultiplayerSessionSubsystem)
 	{
 		MultiplayerSessionSubsystem->CreateSession(NumPublicConnections, MatchType);
-
 	}
 }
 

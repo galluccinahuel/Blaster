@@ -31,6 +31,7 @@ public:
 	void FinishReloading();
 
 	void EquipWeapon(AWeapon* WeaponToEquip);
+	void FireButtonPressed(bool bPressed);
 
 protected:
 
@@ -43,8 +44,6 @@ protected:
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
-
-	void FireButtonPressed(bool bPressed);
 
 	void Fire();
 

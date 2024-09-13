@@ -6,6 +6,7 @@
 #include "BlasterPlayerController.generated.h"
 
 class ABlasterHUD;
+class ABlasterGameMode;
 
 UCLASS()
 class BLASTER_API ABlasterPlayerController : public APlayerController
@@ -21,11 +22,14 @@ public:
 	void SetHUDWeaponAmmo(int32 Ammo);
 	void SetHUDCarriedAmmo(int32 Ammo);
 	void SetHUDMatchCountdown(float countdownTime);
+	void SetHUDAnnouncementCountdown(float countdownTime);
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
 	void OnMatchStateSet(FName State);
 	virtual float GetServerTime();
 	virtual void ReceivedPlayer() override;
+	void HandleMatchHasStarted();
+	void HandleCooldown();
 
 protected:
 
@@ -48,13 +52,24 @@ protected:
 
 	void CheckTimeSync(float DeltaTime);
 
+	UFUNCTION(Server, Reliable)
+	void ServerCheckMatchState();
+
+	UFUNCTION(Client, Reliable)
+	void ClienteJoinMidgame(FName StateOfMatch, float Warmup, float Match, float StaringTime, float CoolDown);
 
 private:
 
 	UPROPERTY()
 	ABlasterHUD* BlasterHUD;
 
-	float MatchTime = 120.f;
+	UPROPERTY()
+	ABlasterGameMode* BlasterGameMode;
+
+	float LevelStartingTime = 0.f;
+	float MatchTime = 0.f;
+	float WarmupTime = 0.f;
+	float CooldownTime = 0.f;
 	uint32 CountdowInt = 0;
 
 	UPROPERTY(ReplicatedUsing = OnRep_MatchState)

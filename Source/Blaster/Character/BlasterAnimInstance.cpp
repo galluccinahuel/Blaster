@@ -9,14 +9,12 @@
 void UBlasterAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
-
 	BlasterCharacter = Cast<ABlasterCharacter>(TryGetPawnOwner());
 }
 
 void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-
 
 	if (BlasterCharacter == nullptr)
 	{
@@ -60,9 +58,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	CharacterRotation = BlasterCharacter->GetActorRotation();
 
 	const FRotator Delta = UKismetMathLibrary::NormalizedDeltaRotator(CharacterRotation, CharacterRotationLastFrame);
-
 	const float Target = Delta.Yaw / DeltaSeconds;
-
 	const float Interp = FMath::FInterpTo(Lean, Target, DeltaSeconds, 6.0f);
 
 	Lean = FMath::Clamp(Interp, -90.0f, 90.0f);
@@ -91,7 +87,5 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 
 	bElimmed = BlasterCharacter->IsElimmed();
-
 	bUseFABRIK = BlasterCharacter->GetCombatState() != ECombatState::ECS_Reloading;
-
 }
